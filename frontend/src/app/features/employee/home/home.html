@@ -1,1 +1,44 @@
-<p>home works!</p>
+<div class="home-page">
+  @if (errorMessage(); as error) {
+    <p>{{ error }}</p>
+  } @else if (employee(); as employee) {
+    <h2>Welcome, {{ employee.name }}</h2>
+    <div class="dashboard">
+      <mat-card class="summary-card">
+        <mat-card-header>
+          <mat-card-title>Training Day Entitlement</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="summary-value">
+            {{ employee.trainingDayEntitlement }}
+          </div>
+          <div class="">days</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card">
+        <mat-card-header>
+          <mat-card-title>Annual Training Budget</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="summary-value">
+            {{ employee.annualTrainingBudget | currency: 'SGD $' }}
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="actions">
+      <a matButton="filled" routerLink="/apply-course">
+        Apply for Course
+      </a>
+      <a matButton="outlined" routerLink="/course-history">
+        View Course History
+      </a>
+    </div>
+  } @else {
+    <p>Loading employee dashboard</p>
+  }
+</div>

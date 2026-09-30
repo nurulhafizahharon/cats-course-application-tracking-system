@@ -1,0 +1,28 @@
+.home-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+.dashboard {
+  display: flex;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.summary-card {
+  flex: 1;
+  text-align: center;
+}
+
+.summary-value {
+  font-size: 32px;
+  font-weight: 600;
+  margin-top: 16px;
+}
+
+.actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 32px;
+}
