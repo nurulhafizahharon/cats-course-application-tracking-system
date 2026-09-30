@@ -1,0 +1,44 @@
+<div class="profile-page">
+  @if (errorMeassge(); as error) {
+    <p>{{ error }}</p>
+  } @else if (employee(); as employee) {
+    <mat-card class="profile-card">
+      <mat-card-header>
+        <mat-card-title>Employee Profile</mat-card-title>
+        <mat-card-subtitle>{{ employee.username }}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <p>
+          <strong> Name: </strong>
+          {{ employee.name }}
+        </p>
+
+        <p>
+          <strong> Designation: </strong>
+          {{ employee.designation }}
+        </p>
+
+        <p>
+          <strong> Date of Joining: </strong>
+          {{ employee.dateOfJoining | date: 'dd MMM yyyy' }}
+        </p>
+
+        <p>
+          <strong> Training Days: </strong>
+          {{ employee.trainingDayEntitlement }}
+        </p>
+        <p>
+          <strong> Annual Budget: </strong>
+          {{ employee.annualTrainingBudget | currency: 'SGD $' }}
+        </p>
+        <p>
+          <strong> Manager Name: </strong>
+          {{ employee.managerName }}
+        </p>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <p>Loading employee profile...</p>
+  }
+</div>
