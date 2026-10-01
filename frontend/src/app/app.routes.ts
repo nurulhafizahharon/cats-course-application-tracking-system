@@ -4,6 +4,7 @@ import { Profile } from './features/employee/profile/profile';
 import { CourseHistory } from './features/employee/course-history/course-history';
 import { ApplyCourse } from './features/employee/apply-course/apply-course';
 import { CourseApplicationDetails } from './features/employee/course-application-details/course-application-details';
+import { UpdateCourseApplication } from './features/employee/update-course-application/update-course-application';
 
 export const routes: Routes = [
   {
@@ -30,5 +31,9 @@ export const routes: Routes = [
   {
     path: 'course-history/:applicationId',
     component: CourseApplicationDetails,
+  },
+  {
+    path: 'course-history/:applicationId/update',
+    component: UpdateCourseApplication,
   },
 ];

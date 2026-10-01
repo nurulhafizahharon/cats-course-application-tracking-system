@@ -1,1 +1,107 @@
-<p>course-application-details works!</p>
+<div class="application-details-page">
+  @if (errorMessage(); as error) {
+    <div class="error-message">
+      {{ error }}
+    </div>
+  } @else if (application(); as application) {
+    <mat-card class="application-card">
+      <mat-card-header>
+        <mat-card-title> Course Application </mat-card-title>
+        <mat-card-subtitle>
+          {{ application.courseTitle }}
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="details-grid">
+          <div class="detail-item">
+            <strong>Status</strong>
+            <span class="status-badge">
+              {{ application.status }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <strong>Course Category:</strong>
+            <span>
+              @switch (application.category) {
+                @case ('INTERNAL_TRAINING') {
+                  Internal Training
+                }
+                @case ('EXTERNAL_COURSE') {
+                  External Course
+                }
+                @case ('PROFESSIONAL_CERTIFICATION') {
+                  Professional Certification
+                }
+                @default {
+                  {{ application.category }}
+                }
+              }
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <strong>Training Provider:</strong>
+            <span>
+              {{ application.trainingProviderName }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <strong>Duration:</strong>
+            <span> {{ application.durationDays }} days </span>
+          </div>
+
+          <div class="detail-item">
+            <strong>Start Date:</strong>
+            <span>
+              {{ application.startDate | date: 'dd MMM yyyy' }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <strong>End Date:</strong>
+            <span>
+              {{ application.endDate | date: 'dd MMM yyyy' }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <strong>Course Fee:</strong>
+            <span>
+              {{ application.fee | currency: 'SGD' : 'symbol-narrow' : '1.2-2' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="text-section">
+          <strong>Justification</strong>
+          <p>
+            {{ application.justification }}
+          </p>
+        </div>
+
+        <div class="text-section">
+          <strong>Work Dissemination</strong>
+          <p>
+            {{ application.workDissemination }}
+          </p>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions class="application-actions">
+        @if (application.status === 'APPLIED' || application.status === 'UPDATED') {
+          <button
+            matButton="filled"
+            [routerLink]="['/course-history', application.applicationId, 'update']"
+          >
+            Update
+          </button>
+          <button matButton="outlined" (click)="confirmDelete()">Delete</button>
+        }
+      </mat-card-actions>
+    </mat-card>
+  } @else {
+    <p>Loading course application...</p>
+  }
+</div>

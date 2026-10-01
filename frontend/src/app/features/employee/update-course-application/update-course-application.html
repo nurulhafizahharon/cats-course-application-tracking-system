@@ -1,0 +1,62 @@
+<div class="update-course-page">
+  <h2>Update Course Application</h2>
+
+  @if (errorMessage(); as error) {
+    <p class="error-message">{{ error }}</p>
+  } @else if (application()) {
+    <form [formGroup]="updateForm">
+      <div>
+        <label for="courseTitle">Course Title</label>
+        <input type="text" id="courseTitle" formControlName="courseTitle" />
+      </div>
+
+      <div class="">
+        <label for="category">Course Category</label>
+        <select formControlName="category" id="category">
+          <option value="INTERNAL_TRAINING">Internal Training</option>
+          <option value="EXTERNAL_COURSE">External Course</option>
+          <option value="PROFESSIONAL_CERTIFICATION">Professional Certification</option>
+        </select>
+      </div>
+
+      <div class="">
+        <label for="trainingProviderId">Training Provider ID</label>
+        <input type="number" id="trainingProviderId" formControlName="trainingProviderId" />
+      </div>
+
+      @if (updateForm.get('category')?.value === 'INTERNAL_TRAINING') {
+        <div class="">
+          <label for="halfDay">Training Duration</label>
+          <span>Half Day</span>
+        </div>
+      }
+
+      <div>
+        <label for="startDate">Start Date</label>
+        <input type="date" id="startDate" formControlName="startDate" />
+      </div>
+
+      <div>
+        <label for="endDate">End Date</label>
+        <input type="date" id="endDate" formControlName="endDate" />
+      </div>
+
+      <div>
+        <label for="fee">Course Fee</label>
+        <input type="number" id="fee" formControlName="fee" />
+      </div>
+
+      <div class="">
+        <label for="justification">Justification</label>
+        <textarea formControlName="justification" id="justification"></textarea>
+      </div>
+
+      <div class="">
+        <label for="workDissemination"> Work Dissemination </label>
+        <textarea formControlName="workDissemination" id="workDissemination"></textarea>
+      </div>
+    </form>
+  } @else {
+    <p>Loading course application...</p>
+  }
+</div>
