@@ -38,6 +38,7 @@ public class ApplicationValidationService {
 
 	public void validate(CourseApplicationRequest request) {
 		validateFee(request);
+		validateHalfDay(request);
 	}
 
 	private void validateFee(CourseApplicationRequest request) {
@@ -52,6 +53,16 @@ public class ApplicationValidationService {
 		if (fee == null || fee.compareTo(BigDecimal.ZERO) <= 0) {
 			throw new IllegalArgumentException(
 					"Course fee must be greater than zero for External Course and Professional Certification");
+		}
+	}
+
+	private void validateHalfDay(CourseApplicationRequest request) {
+		boolean shouldBeHalfDay = request.category() == CourseCategory.INTERNAL_TRAINING;
+
+		if (request.halfDay() != shouldBeHalfDay) {
+			throw new IllegalArgumentException(
+					request.category() == CourseCategory.INTERNAL_TRAINING ? "Internal Training must be half day"
+							: "Half-day session are only allowed for Internal Training");
 		}
 	}
 

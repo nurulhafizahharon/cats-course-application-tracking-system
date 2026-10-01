@@ -17,6 +17,7 @@ import sg.edu.nus.cats.entity.CourseCatalogueItem;
 import sg.edu.nus.cats.entity.Employee;
 import sg.edu.nus.cats.entity.TrainingProvider;
 import sg.edu.nus.cats.enums.ApplicationStatus;
+import sg.edu.nus.cats.enums.CourseCategory;
 import sg.edu.nus.cats.mapper.CourseApplicationMapper;
 import sg.edu.nus.cats.repository.CourseApplicationRepository;
 import sg.edu.nus.cats.repository.CourseCatalogueItemRepository;
@@ -149,15 +150,20 @@ public class CourseApplicationService {
 		}
 
 		applicationValidationService.validate(request);
+		
+		// CATEGORY BUSINESS RULE. INTERNAL -> FEE = 0
+		boolean halfDay = request.category() == CourseCategory.INTERNAL_TRAINING;
+		
+		BigDecimal fee = halfDay ? BigDecimal.ZERO : request.fee();
 
 		BigDecimal durationDays = trainingDayCalculator.calculate(request.startDate(), request.endDate(),
-				request.category(), request.halfDay());
+				request.category(), halfDay);
 
 		applicationValidationService.validateOverlap(employee, request.startDate(), request.endDate(), applicationId);
 
 		entitlementValidationService.validate(employee, request.startDate(), durationDays, applicationId);
 
-		budgetValidationService.validate(employee, request.startDate(), request.fee(), applicationId);
+		budgetValidationService.validate(employee, request.startDate(), fee, applicationId);
 
 		application.setCourseTitle(request.courseTitle());
 		application.setCategory(request.category());
@@ -166,8 +172,8 @@ public class CourseApplicationService {
 		application.setStartDate(request.startDate());
 		application.setEndDate(request.endDate());
 		application.setDurationDays(durationDays);
-		application.setFee(request.fee());
-		application.setHalfDay(request.halfDay());
+		application.setFee(fee);
+		application.setHalfDay(halfDay);
 		application.setJustification(request.justification());
 		application.setWorkDissemination(request.workDissemination());
 		application.setStatus(ApplicationStatus.UPDATED);

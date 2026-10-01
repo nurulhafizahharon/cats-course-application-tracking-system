@@ -4,56 +4,60 @@
   @if (errorMessage(); as error) {
     <p class="error-message">{{ error }}</p>
   } @else if (application()) {
-    <form [formGroup]="updateForm">
-      <div>
-        <label for="courseTitle">Course Title</label>
-        <input type="text" id="courseTitle" formControlName="courseTitle" />
-      </div>
-
-      <div class="">
-        <label for="category">Course Category</label>
-        <select formControlName="category" id="category">
-          <option value="INTERNAL_TRAINING">Internal Training</option>
-          <option value="EXTERNAL_COURSE">External Course</option>
-          <option value="PROFESSIONAL_CERTIFICATION">Professional Certification</option>
-        </select>
-      </div>
-
-      <div class="">
-        <label for="trainingProviderId">Training Provider ID</label>
-        <input type="number" id="trainingProviderId" formControlName="trainingProviderId" />
-      </div>
-
-      @if (updateForm.get('category')?.value === 'INTERNAL_TRAINING') {
-        <div class="">
-          <label for="halfDay">Training Duration</label>
-          <span>Half Day</span>
+    <form [formGroup]="updateForm" (ngSubmit)="onSubmit()" class="update-form">
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="courseTitle">Course Title</label>
+          <input type="text" id="courseTitle" formControlName="courseTitle" />
         </div>
-      }
 
-      <div>
-        <label for="startDate">Start Date</label>
-        <input type="date" id="startDate" formControlName="startDate" />
+        <div class="form-field">
+          <label for="category">Course Category</label>
+          <select formControlName="category" id="category">
+            <option value="INTERNAL_TRAINING">Internal Training</option>
+            <option value="EXTERNAL_COURSE">External Course</option>
+            <option value="PROFESSIONAL_CERTIFICATION">Professional Certification</option>
+          </select>
+          @if (updateForm.get('category')?.value === 'INTERNAL_TRAINING') {
+            <span class="duration-note">Training Duration: <strong> Half Day </strong> </span>
+          }
+        </div>
+
+        <div class="form-field">
+          <label for="trainingProviderId">Training Provider ID</label>
+          <input type="number" id="trainingProviderId" formControlName="trainingProviderId" />
+        </div>
+
+        <div class="form-field">
+          <label for="fee">Course Fee</label>
+          <input type="number" id="fee" formControlName="fee" />
+        </div>
+
+        <div class="form-field">
+          <label for="startDate">Start Date</label>
+          <input type="date" id="startDate" formControlName="startDate" />
+        </div>
+
+        <div class="form-field">
+          <label for="endDate">End Date</label>
+          <input type="date" id="endDate" formControlName="endDate" />
+        </div>
+
+        <div class="form-field full-width">
+          <label for="justification">Justification</label>
+          <textarea formControlName="justification" id="justification" rows="3"></textarea>
+        </div>
+
+        <div class="form-field full-width">
+          <label for="workDissemination"> Work Dissemination </label>
+          <textarea formControlName="workDissemination" id="workDissemination" rows="3"></textarea>
+        </div>
       </div>
 
-      <div>
-        <label for="endDate">End Date</label>
-        <input type="date" id="endDate" formControlName="endDate" />
-      </div>
+      <div class="form-actions">
+        <button type="submit" [disabled]="updateForm.invalid" class="update-button">Update</button>
 
-      <div>
-        <label for="fee">Course Fee</label>
-        <input type="number" id="fee" formControlName="fee" />
-      </div>
-
-      <div class="">
-        <label for="justification">Justification</label>
-        <textarea formControlName="justification" id="justification"></textarea>
-      </div>
-
-      <div class="">
-        <label for="workDissemination"> Work Dissemination </label>
-        <textarea formControlName="workDissemination" id="workDissemination"></textarea>
+        <button type="button" (click)="cancelUpdate()" class="cancel-button">Cancel</button>
       </div>
     </form>
   } @else {

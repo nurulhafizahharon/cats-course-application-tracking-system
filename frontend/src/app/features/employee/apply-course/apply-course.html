@@ -1,1 +1,107 @@
-<p>apply-course works!</p>
+<div class="apply-course-page">
+  <h2>Apply for Course</h2>
+
+  <form [formGroup]="applicationForm" (ngSubmit)="onSubmit()">
+
+    @if(errorMessage(); as error) {
+      <div class="error-message">
+        {{ error }}
+      </div>
+    }
+
+    <div class="course-source">
+      <label for="">Course Source</label>
+      <label for="">
+        <input type="radio" formControlName="courseSource" value="CATALOGUE"/>
+        Course Catalogue
+      </label>
+      <label for="">
+        <input type="radio" formControlName="courseSource" value="MANUAL">
+        Manual Entry
+      </label>
+    </div>
+
+    <div class="form-grid">
+
+      @if(applicationForm.get('courseSource')?.value === 'CATALOGUE') {
+        <div class="form-field">
+          <label for="courseCatalogueItemId">Course</label>
+          <select formControlName="courseCatalogueItemId" id="courseCatalogueItemId">
+            <option [ngValue]="null">Select a Course</option>
+            @for(course of courseCatalogue; track course.courseId) {
+              <option [ngValue]="course.courseId">{{ course.title }}</option>
+            }
+          </select>
+        </div>
+      } @else {
+        <div class="form-field">
+          <label for="courseTitle">Course Title</label>
+          <input type="text" id="courseTitle" formControlName="courseTitle"/>
+          @if(applicationForm.get('courseTitle')?.touched && applicationForm.get('courseTitle')?.hasError('required')) {
+            <span class="field-error">Course title is required</span>
+          }
+          @if(fieldErrors()['courseTitle']; as error) {
+            <span class="field-error">{{ error }}</span>
+          }
+        </div>
+      }
+      
+      <div class="form-field">
+        <label for="category">Course Category</label>
+        <select formControlName="category" id="category">
+          <option value="">Select Course Category</option>
+          <option value="INTERNAL_TRAINING">Internal Training</option>
+          <option value="EXTERNAL_COURSE">External Course</option>
+          <option value="PREFESSIONAL_CERTIFICATION">Professional Certification</option>
+        </select>
+        @if(applicationForm.get('category')?.value === 'INTERNAL_TRAINING') {
+          <span class="duration-note">Training Duration: <strong>Half Day</strong> </span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="trainingProviderId">Training Provider</label>
+        <select formControlName="trainingProviderId" id="trainingProviderId">
+          <option [ngValue]="0">Select Training Provider</option>
+
+          @for(provider of trainingProviders; track provider.providerId) {
+            <option [ngValue]="provider.providerId">{{ provider.name }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label for="fee">Course Fee</label>
+        <input type="number" id="fee" formControlName="fee"/>
+      </div>
+
+      <div class="form-field">
+        <label for="startDate">Start Date</label>
+        <input type="date" id="startDate" formControlName="startDate"/>
+      </div>
+
+      <div class="form-field">
+        <label for="endDate">End Date</label>
+        <input type="date" id="endDate" formControlName="endDate"/>
+      </div>
+
+      <div class="form-field full-width">
+        <label for="justification">Justification</label>
+        <textarea id="justification" rows="3" formControlName="justification"></textarea>
+      </div>
+
+      <div class="form-field full-width">
+        <label for="workDissemination">Work Dissemination</label>
+        <textarea id="workDissemination" rows="3" formControlName="workDissemination"></textarea>
+      </div>
+
+      <div class="form-actions full-width">
+        <button type="submit" class="submit-button" [disabled]="applicationForm.invalid">Submit Application</button>
+        <button type="button" class="cancel-button" (click)="cancel()">Cancel</button>
+      </div>
+
+    </div>
+
+  </form>
+
+</div>

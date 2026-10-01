@@ -1,11 +1,12 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CourseApplicationService } from '../../../services/course-application-service';
 import { CourseApplication } from '../../../models/course-application';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CourseApplicationRequest } from '../../../models/course-application-request';
 
 @Component({
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   selector: 'app-update-course-application',
   styleUrl: './update-course-application.scss',
   templateUrl: './update-course-application.html',
@@ -13,7 +14,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 export class UpdateCourseApplication implements OnInit {
   private route = inject(ActivatedRoute);
   private courseApplicationService = inject(CourseApplicationService);
-
+  private router = inject(Router);
   private formBuilder = inject(FormBuilder);
 
   application = signal<CourseApplication | null>(null);
@@ -36,9 +37,39 @@ export class UpdateCourseApplication implements OnInit {
     const applicationId = Number(this.route.snapshot.paramMap.get('applicationId'));
 
     this.updateForm.get('category')?.valueChanges.subscribe((category) => {
+      const isInternal = category === 'INTERNAL_TRAINING';
+      const feeControl = this.updateForm.get('fee');
+      const startDateControl = this.updateForm.get('startDate');
+      const endDateControl = this.updateForm.get('endDate');
+
       this.updateForm.patchValue({
-        halfDay: category === 'INTERNAL_TRAINING',
+        halfDay: isInternal,
+        // fee: isInternal ? 0 : this.updateForm.get('fee')?.value,
       });
+
+      if (isInternal) {
+        feeControl?.setValue(0);
+        feeControl?.disable();
+
+        // INTERNAL TRAINING IS A HALF-DAY, SINGLE DAY APPLICATION
+        endDateControl?.setValue(startDateControl?.value ?? null);
+        endDateControl?.disable();
+      } else {
+        feeControl?.enable();
+        endDateControl?.enable();
+
+        if (feeControl?.value === 0) {
+          feeControl.setValue(null);
+        }
+      }
+    });
+
+    this.updateForm.get('startDate')?.valueChanges.subscribe((startDate) => {
+      const category = this.updateForm.get('category')?.value;
+
+      if (category === 'INTERNAL_TRAINING') {
+        this.updateForm.get('endDate')?.setValue(startDate);
+      }
     });
 
     console.log('Update Application ID from URL:', applicationId);
@@ -60,6 +91,23 @@ export class UpdateCourseApplication implements OnInit {
           justification: application.justification,
           workDissemination: application.workDissemination,
         });
+
+        const isInternal = application.category === 'INTERNAL_TRAINING';
+
+        const feeControl = this.updateForm.get('fee');
+        const endDateControl = this.updateForm.get('endDate');
+
+        if (isInternal) {
+          feeControl?.setValue(0);
+          feeControl?.disable();
+
+          endDateControl?.setValue(application.startDate);
+          endDateControl?.disable();
+        } else {
+          feeControl?.enable();
+          endDateControl?.enable();
+        }
+
         console.log('Update form:', this.updateForm.value);
       },
       error: (error) => {
@@ -67,5 +115,58 @@ export class UpdateCourseApplication implements OnInit {
         this.errorMessage.set('Unable to load course application.');
       },
     });
+  }
+
+  onSubmit(): void {
+    if (this.updateForm.invalid) {
+      return;
+    }
+
+    const application = this.application();
+
+    if (!application) {
+      return;
+    }
+
+    const formValue = this.updateForm.getRawValue();
+
+    const request: CourseApplicationRequest = {
+      courseTitle: formValue.courseTitle ?? '',
+      category: formValue.category ?? '',
+      trainingProviderId: formValue.trainingProviderId ?? 0,
+      courseCatalogueItemId: formValue.courseCatalogueItemId,
+      startDate: formValue.startDate ?? '',
+      endDate: formValue.endDate ?? '',
+      fee: formValue.fee ?? 0,
+      halfDay: formValue.category === 'INTERNAL_TRAINING',
+      justification: formValue.justification ?? '',
+      workDissemination: formValue.workDissemination ?? '',
+    };
+
+    console.log('Application ID: ', application.applicationId);
+    console.log('Update request: ', request);
+
+    this.courseApplicationService
+      .updateApplication(application.applicationId, 'aliceTheEmployee', request)
+      .subscribe({
+        next: (updatedApplication) => {
+          console.log('Application updated successfully: ', updatedApplication);
+          this.router.navigate(['/course-history', updatedApplication.applicationId]);
+        },
+        error: (error) => {
+          console.error('Failed to update application: ', error);
+          this.errorMessage.set('Unable to update course application.');
+        },
+      });
+  }
+
+  cancelUpdate(): void {
+    const application = this.application();
+
+    if (!application) {
+      return;
+    }
+
+    this.router.navigate(['/course-history', application.applicationId]);
   }
 }
