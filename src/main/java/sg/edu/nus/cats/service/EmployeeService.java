@@ -1,11 +1,14 @@
 package sg.edu.nus.cats.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import sg.edu.nus.cats.dto.EmployeeCreateRequest;
+import sg.edu.nus.cats.dto.EmployeeDashboardResponse;
 import sg.edu.nus.cats.dto.EmployeeResponse;
 import sg.edu.nus.cats.dto.EmployeeUpdateRequest;
 import sg.edu.nus.cats.entity.Employee;
@@ -18,12 +21,17 @@ public class EmployeeService {
 	private final EmployeeRepository employeeRepository;
 	private final EmployeeMapper employeeMapper;
 	private final PasswordEncoder passwordEncoder;
+	private final EntitlementValidationService entitlementValidationService;
+	private final BudgetValidationService budgetValidationService;
 
 	public EmployeeService(EmployeeRepository employeeRepository, EmployeeMapper employeeMapper,
-			PasswordEncoder passwordEncoder) {
+			PasswordEncoder passwordEncoder, EntitlementValidationService entitlementValidationService,
+			BudgetValidationService budegetValidationService) {
 		this.employeeRepository = employeeRepository;
 		this.employeeMapper = employeeMapper;
 		this.passwordEncoder = passwordEncoder;
+		this.entitlementValidationService = entitlementValidationService;
+		this.budgetValidationService = budegetValidationService;
 	}
 
 	// CREATE EMPLOYEE
@@ -98,6 +106,24 @@ public class EmployeeService {
 		Employee updatedEmployee = employeeRepository.save(employee);
 
 		return employeeMapper.toResponse(updatedEmployee);
+	}
+
+	// GET EMPLOYEE DASHBOARD DETAILS
+	public EmployeeDashboardResponse getEmployeeDashboard(String username) {
+
+		Employee employee = employeeRepository.findByUsername(username)
+				.orElseThrow(() -> new IllegalArgumentException("Employee not found"));
+
+		LocalDate today = LocalDate.now();
+
+		BigDecimal remainingTrainingDays = entitlementValidationService.getRemainingEntitlement(employee, today);
+
+		BigDecimal remainingBudget = budgetValidationService.getRemainingBudget(employee, today);
+
+		return new EmployeeDashboardResponse(employee.getEmployeeId(), username, employee.getName(),
+				employee.getAnnualTrainingBudget(), employee.getTrainingDayEntitlement(), remainingBudget,
+				remainingTrainingDays);
+
 	}
 
 }

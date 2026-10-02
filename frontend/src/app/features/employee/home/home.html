@@ -1,30 +1,35 @@
 <div class="home-page">
   @if (errorMessage(); as error) {
     <p>{{ error }}</p>
-  } @else if (employee(); as employee) {
+  } @else if (dashboard(); as employee) {
     <h2>Welcome, {{ employee.name }}</h2>
     <div class="dashboard">
       <mat-card class="summary-card">
         <mat-card-header>
-          <mat-card-title>Training Day Entitlement</mat-card-title>
+          <mat-card-title>Training Day Remaining</mat-card-title>
         </mat-card-header>
 
         <mat-card-content>
           <div class="summary-value">
-            {{ employee.trainingDayEntitlement }}
+            {{ employee.remainingTrainingDayEntitlement }}
           </div>
-          <div class="">days</div>
+          <div class="">
+            of {{ employee.trainingDayEntitlement }} days
+          </div>
         </mat-card-content>
       </mat-card>
 
       <mat-card class="summary-card">
         <mat-card-header>
-          <mat-card-title>Annual Training Budget</mat-card-title>
+          <mat-card-title>Annual Training Budget Remaining</mat-card-title>
         </mat-card-header>
 
         <mat-card-content>
           <div class="summary-value">
-            {{ employee.annualTrainingBudget | currency: 'SGD $' }}
+            {{ employee.remainingTrainingBudget | currency: 'SGD $' }}
+          </div>
+          <div class="">
+            of {{ employee.annualTrainingBudget | currency: 'SGD $' }}
           </div>
         </mat-card-content>
       </mat-card>

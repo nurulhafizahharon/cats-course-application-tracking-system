@@ -49,4 +49,19 @@ public class BudgetValidationService {
 					"Application exceeds remaining annual training budget. Remaining budget: $" + remaining);
 		}
 	}
+	
+	public BigDecimal getRemainingBudget(Employee employee, LocalDate date) {
+	int year = date.getYear();
+		
+		LocalDate yearStart = LocalDate.of(year, 1, 1);
+		LocalDate yearEnd = LocalDate.of(year, 12, 31);
+		
+		List<CourseApplication> applications = applicationRepository.findByEmployeeYearAndStatuses(employee, yearStart, yearEnd, BUDGET_STATUSES, null);
+		
+		BigDecimal usedBudget = applications.stream().map(CourseApplication::getFee).filter(fee -> fee != null).reduce(BigDecimal.ZERO, BigDecimal::add);
+		
+		BigDecimal annualBudget = employee.getAnnualTrainingBudget();
+		
+		return annualBudget.subtract(usedBudget);
+	}
 }

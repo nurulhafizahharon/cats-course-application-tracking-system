@@ -47,5 +47,20 @@ public class EntitlementValidationService {
 							+ " day(s)");
 		}
 	}
+	
+	public BigDecimal getRemainingEntitlement(Employee employee, LocalDate date) {
+		int year = date.getYear();
+		
+		LocalDate yearStart = LocalDate.of(year, 1, 1);
+		LocalDate yearEnd = LocalDate.of(year, 12, 31);
+		
+		List<CourseApplication> applications = applicationRepository.findByEmployeeYearAndStatuses(employee, yearStart, yearEnd, ENTITLEMENT_STATUSES, null);
+		
+		BigDecimal usedDays = applications.stream().map(CourseApplication::getDurationDays).filter(duration -> duration != null).reduce(BigDecimal.ZERO, BigDecimal::add);
+		
+		BigDecimal entitlement = employee.getTrainingDayEntitlement();
+		return entitlement.subtract(usedDays);
+		
+	}
 
 }
